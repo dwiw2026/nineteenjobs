@@ -78,6 +78,33 @@
     </div>
 
     <div class="space-y-6">
+        <div class="rounded-2xl border border-[#e2eae0] bg-white p-6 mb-6">
+            @if(auth()->check() && auth()->user()->isJobSeeker())
+                @if(auth()->user()->applications()->where('job_listing_id', $jobListing->id)->exists())
+                    <button disabled class="w-full rounded-xl bg-[#e0e8df] px-4 py-3 text-sm font-bold text-[#7b877d] cursor-not-allowed">
+                        Sudah Dilamar
+                    </button>
+                    <p class="mt-2 text-center text-[11px] text-[#7b877d]">Anda sudah melamar pekerjaan ini.</p>
+                @else
+                    <form method="POST" action="{{ route('jobs.apply', $jobListing) }}">
+                        @csrf
+                        <div class="text-left mb-4">
+                            <label class="block text-xs font-semibold text-[#2d3d30] mb-1.5">Cover Letter (Opsional)</label>
+                            <textarea name="cover_letter" rows="3" class="w-full rounded-xl border border-[#dce7d6] bg-[#f8faf5] px-3 py-2 text-sm focus:border-[#b7f34a] focus:outline-none focus:ring-2 focus:ring-[#b7f34a]/30" placeholder="Ceritakan singkat mengapa Anda cocok..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full rounded-xl bg-[#b7f34a] px-4 py-3 text-sm font-bold text-[#182516] hover:bg-[#a5e839] transition">
+                            Lamar Pekerjaan
+                        </button>
+                        <p class="mt-3 text-center text-[11px] text-[#7b877d]">CV/Resume otomatis dilampirkan dari Profil Anda.</p>
+                    </form>
+                @endif
+            @elseif(!auth()->check())
+                <a href="{{ route('login') }}" class="block text-center w-full rounded-xl bg-[#b7f34a] px-4 py-3 text-sm font-bold text-[#182516] hover:bg-[#a5e839] transition">
+                    Login untuk Melamar
+                </a>
+            @endif
+        </div>
+
         <div class="rounded-2xl border border-[#e2eae0] bg-white p-6">
             <h3 class="font-semibold text-[#19251d] mb-3">Tentang Perusahaan</h3>
             <p class="text-sm font-medium">{{ $jobListing->company->name ?? 'Perusahaan' }}</p>

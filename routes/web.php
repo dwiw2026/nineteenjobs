@@ -55,7 +55,10 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:isJobSeeker')->group(function () {
         Route::prefix('my')->group(function () {
             Route::get('/matches', [\App\Http\Controllers\MatchController::class, 'index'])->name('matches.index');
-            Route::get('/applications', fn () => view('applications.index'))->name('applications.index');
+            Route::get('/applications', fn () => view('applications.index', [
+                'applications' => auth()->user()->applications()->with('jobListing.company')->latest()->get()
+            ]))->name('applications.index');
+            Route::post('/jobs/{jobListing:slug}/apply', [JobListingController::class, 'apply'])->name('jobs.apply');
             Route::get('/roadmap', fn () => view('roadmap.index'))->name('roadmap.index');
         });
         Route::get('/agent', fn () => view('agent.chat'))->name('agent.chat');

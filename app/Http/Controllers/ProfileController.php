@@ -65,18 +65,28 @@ class ProfileController extends Controller
             'skills' => 'nullable|string',
             'experience_years' => 'nullable|integer|min:0',
             'location' => 'nullable|string|max:255',
+            'resume' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
         ]);
 
         $skills = $validated['skills'] ? array_map('trim', explode(',', $validated['skills'])) : [];
 
         $profile = $request->user()->candidateProfile;
         if ($profile) {
-            $profile->update([
+            $data = [
                 'headline' => $validated['headline'],
                 'skills' => $skills,
                 'experience_years' => $validated['experience_years'],
                 'location' => $validated['location'],
-            ]);
+            ];
+
+            if ($request->hasFile('resume')) {
+                if ($profile->resume_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($profile->resume_path)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($profile->resume_path);
+                }
+                $data['resume_path'] = $request->file('resume')->store('resumes', 'public');
+            }
+
+            $profile->update($data);
             $profile->recalculateCompleteness();
         }
 

@@ -47,4 +47,27 @@ class JobListingController extends Controller
 
         return view('jobs.show', compact('jobListing', 'similar'));
     }
+
+    public function apply(Request $request, JobListing $jobListing)
+    {
+        abort_if($jobListing->status !== 'published', 404);
+        
+        $user = $request->user();
+
+        if ($user->applications()->where('job_listing_id', $jobListing->id)->exists()) {
+            return back()->with('error', 'Anda sudah melamar pekerjaan ini.');
+        }
+
+        $request->validate([
+            'cover_letter' => 'nullable|string|max:2000',
+        ]);
+
+        $user->applications()->create([
+            'job_listing_id' => $jobListing->id,
+            'cover_letter' => $request->input('cover_letter'),
+            'resume_path' => $user->candidateProfile?->resume_path,
+        ]);
+
+        return redirect()->route('applications.index')->with('success', 'Berhasil melamar pekerjaan!');
+    }
 }
