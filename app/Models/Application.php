@@ -14,6 +14,7 @@ class Application extends Model
     protected $fillable = [
         'user_id', 'job_listing_id', 'cover_letter', 'resume_path',
         'status', 'employer_notes', 'applied_at', 'status_updated_at',
+        'interview_at', 'interview_location',
     ];
 
     protected function casts(): array
@@ -21,6 +22,7 @@ class Application extends Model
         return [
             'applied_at' => 'datetime',
             'status_updated_at' => 'datetime',
+            'interview_at' => 'datetime',
         ];
     }
 
@@ -46,7 +48,7 @@ class Application extends Model
             'pending' => 'Menunggu',
             'review' => 'Ditinjau',
             'interview' => 'Interview',
-            'offered' => 'Ditawari',
+            'offered' => 'Diterima',
             'rejected' => 'Ditolak',
             'withdrawn' => 'Dicabut',
             default => ucfirst($this->status),

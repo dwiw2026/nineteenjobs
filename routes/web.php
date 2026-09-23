@@ -65,9 +65,12 @@ Route::middleware('auth')->group(function () {
     });
 
     // Employer routes
-    Route::prefix('employer')->name('employer.')->group(function () {
+    Route::prefix('employer')->name('employer.')->middleware('can:isEmployer')->group(function () {
         Route::resource('jobs', \App\Http\Controllers\Employer\JobListingController::class);
-        Route::get('/applications', fn () => view('employer.applications.index'))->name('applications.index');
+        Route::get('/applications', [\App\Http\Controllers\Employer\ApplicationController::class, 'index'])->name('applications.index');
+        Route::get('/applications/{application}', [\App\Http\Controllers\Employer\ApplicationController::class, 'show'])->name('applications.show');
+        Route::patch('/applications/{application}/status', [\App\Http\Controllers\Employer\ApplicationController::class, 'updateStatus'])->name('applications.status');
+        Route::get('/applications/{application}/resume', [\App\Http\Controllers\Employer\ApplicationController::class, 'resume'])->name('applications.resume');
         Route::get('/company', \App\Http\Controllers\Employer\CompanyController::class . '@index')->name('company.index');
         Route::get('/company/create', \App\Http\Controllers\Employer\CompanyController::class . '@create')->name('company.create');
         Route::post('/company', \App\Http\Controllers\Employer\CompanyController::class . '@store')->name('company.store');
